@@ -1,0 +1,75 @@
+{
+    "appKeys": {
+        "MSGKEY_LOCALE": 0
+    },
+    "capabilities": [
+        "configurable"
+    ],
+    "companyName": "TK4 Private Inc.",
+    "longName": "The Force Watchface",
+    "projectType": "native",
+    "resources": {
+        "media": [
+            {
+                "file": "images/jabba.png",
+                "name": "jabba",
+                "type": "png"
+            },
+            {
+                "file": "images/millenium-falcon.png",
+                "name": "millenium_falcon",
+                "type": "png"
+            },
+            {
+                "file": "images/death_star.png",
+                "name": "death_star",
+                "type": "png"
+            },
+            {
+                "characterRegex": "[0-9a-zA-Z %.:,;\\/\\-_]",
+                "file": "fonts/Rebellion28.ttf",
+                "name": "FONT_KEY_REBELLION_28",
+                "type": "font"
+            },
+            {
+                "characterRegex": "[0-9a-zA-Z %.:,;\\/\\-_]",
+                "file": "fonts/Rebellion14.ttf",
+                "name": "FONT_KEY_REBELLION_14",
+                "type": "font"
+            },
+            {
+                "file": "images/the_force_logo.png",
+                "menuIcon": true,
+                "name": "the_force_logo",
+                "type": "png"
+            },
+            {
+                "file": "images/han_solo.png",
+                "name": "han_solo",
+                "type": "png"
+            },
+            {
+                "file": "images/darth_vader.png",
+                "name": "darth_vader",
+                "type": "png"
+            },
+            {
+                "file": "images/boba_fett.png",
+                "name": "boba_fett",
+                "type": "png"
+            },
+            {
+                "file": "images/star_wars_logo.png",
+                "name": "star_wars",
+                "type": "png"
+            }
+        ]
+    },
+    "shortName": "The Force",
+    "uuid": "0e3557a2-fa9a-4b79-b6c8-8aa2a4f8427a",
+    "versionCode": 1,
+    "versionLabel": "0.3",
+    "watchapp": {
+        "watchface": true
+    }
+}
