@@ -29,224 +29,233 @@ char tolower_table[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
 const uint32_t PERSISTENCE_ID_LOCALE = 0;
 
 // message constants
-const uint32_t MSG_KEY_LOCALE = 0x0;
-const uint8_t MSG_KEY_COUNT = 1;
-
-/*
-int n_window_loads = 0;
-char str_main[] = "12345678901234567890123456789012"; // buffer of 32+1 chars
-char fmt_main[] = "This is the %2d%s update";
-char str_st[] = "st";
-char str_nd[] = "nd";
-char str_rd[] = "rd";
-char str_th[] = "th";
-*/
+#define MSG_KEY_LOCALE_GET 0
+#define MSG_KEY_LOCALE_SET 1
 
 void update_time() {
-  // Get a tm structure
-  time_t temp = time(NULL); 
-  struct tm *tick_time = localtime(&temp);
-  if(clock_is_24h_style() == true) { // Use 24 hour format
-    strftime(str_time, sizeof(str_time), "%H:%M", tick_time);
-  } else { // Use 12 hour format
-    strftime(str_time, sizeof(str_time), "%I:%M", tick_time);
-  }
-  // test code
-  // text_layer_set_text(tl_time, "56:78");
-  text_layer_set_text(tl_time, str_time);
-  /*
-  static char logBuf[] = "12345678901234567890123456789012";
-  strftime(logBuf, 33, "[TheForce] ticked at %H:%M", tick_time);
-  APP_LOG(APP_LOG_LEVEL_DEBUG, logBuf);
-  */
+	// Get a tm structure
+	time_t temp = time(NULL); 
+	struct tm *tick_time = localtime(&temp);
+	if(clock_is_24h_style() == true) { // Use 24 hour format
+		strftime(str_time, sizeof(str_time), "%H:%M", tick_time);
+	} else { // Use 12 hour format
+		strftime(str_time, sizeof(str_time), "%I:%M", tick_time);
+	}
+	// test code
+	// text_layer_set_text(tl_time, "56:78");
+	text_layer_set_text(tl_time, str_time);
 }
 
 void update_locale() {
-  const char* loc;
-  if (persist_exists(PERSISTENCE_ID_LOCALE)) {
-    char locale[10];
-    persist_read_string(PERSISTENCE_ID_LOCALE, locale, sizeof(locale));
-    loc = locale;
-  } else {
-    loc = i18n_get_system_locale();
-  }
-  char* pos = 0;
-  if ((pos = strchr(loc, '_')) != 0) {
-    strncpy(current_locale, loc, (pos - loc));
-  } else {
-    strcpy(current_locale, loc);
-  }
-  char* p = current_locale;
-  for ( ; *p; ++p) {
-    *p = tolower_table[(uint8_t)*p];
-  }
-  current_lang = 0;
-  if(strcmp(current_locale, "de") == 0) {
-    current_lang = 1;
-  } else if (strcmp(current_locale, "fr") == 0) {
-    current_lang = 2;
-  }
+	const char* loc;
+	if (persist_exists(PERSISTENCE_ID_LOCALE)) {
+		char locale[10];
+		persist_read_string(PERSISTENCE_ID_LOCALE, locale, sizeof(locale));
+		loc = locale;
+	} else {
+		loc = i18n_get_system_locale();
+	}
+	char* pos = 0;
+	if ((pos = strchr(loc, '_')) != 0) {
+		strncpy(current_locale, loc, (pos - loc));
+	} else {
+		strcpy(current_locale, loc);
+	}
+	char* p = current_locale;
+	for ( ; *p; ++p) {
+		*p = tolower_table[(uint8_t)*p];
+	}
+	current_lang = 0;
+	if(strcmp(current_locale, "de") == 0) {
+		current_lang = 1;
+	} else if (strcmp(current_locale, "fr") == 0) {
+		current_lang = 2;
+	}
 }
 
 void update_date() {
-  update_locale();
-  static char* str_date = "12345678901234567890"; // 20 chars should be fairly enough
-  time_t t = time(NULL); 
-  struct tm *lt = localtime(&t);
-  const char* wd = weekdays[current_lang][lt->tm_wday];
-  char* fmt_date = 0;
-  switch (current_lang) {
-    case 1:
-    case 2: fmt_date = "dd %d.%m.%Y"; break;
-    default: fmt_date = "dd %m/%d/%Y";
-  }
-  strftime(str_date, 21, fmt_date, lt);
-  str_date[0] = wd[0];
-  str_date[1] = wd[1];
-  // test code
-  // text_layer_set_text(tl_date, "So 30.12.2014");
-  text_layer_set_text(tl_date, str_date);
+	update_locale();
+	static char* str_date = "12345678901234567890"; // 20 chars should be fairly enough
+	time_t t = time(NULL); 
+	struct tm *lt = localtime(&t);
+	const char* wd = weekdays[current_lang][lt->tm_wday];
+	char* fmt_date = 0;
+	switch (current_lang) {
+		case 1:
+		case 2: fmt_date = "dd %d.%m.%Y"; break;
+		default: fmt_date = "dd %m/%d/%Y";
+	}
+	strftime(str_date, 21, fmt_date, lt);
+	str_date[0] = wd[0];
+	str_date[1] = wd[1];
+	// test code
+	// text_layer_set_text(tl_date, "So 30.12.2014");
+	text_layer_set_text(tl_date, str_date);
 }
 
 void update_bt(bool connected) {
-  if (connected) {
-    APP_LOG(APP_LOG_LEVEL_INFO, "Phone is connected!");
-    text_layer_set_text(tl_bt, "con");
-  } else {
-    APP_LOG(APP_LOG_LEVEL_INFO, "Phone is not connected!");
-    text_layer_set_text(tl_bt, "dis");
-  }
+	if (connected) {
+		APP_LOG(APP_LOG_LEVEL_INFO, "Phone is connected!");
+		text_layer_set_text(tl_bt, "con");
+	} else {
+		APP_LOG(APP_LOG_LEVEL_INFO, "Phone is not connected!");
+		text_layer_set_text(tl_bt, "dis");
+	}
 }
 
 void update_charge(BatteryChargeState charge_state) {
-  static char buf[] = "1234567890";
-  // snprintf(buf, sizeof(buf), "%d %d\n%d%%", charge_state.is_plugged, charge_state.is_charging, charge_state.charge_percent);
-  snprintf(buf, sizeof(buf), "%d%% %c", charge_state.charge_percent, charge_state.is_charging ? 'c' : charge_state.is_plugged ? 'p' : ' ');
-  // test code
-  // text_layer_set_text(tl_charge, "100%");
-  text_layer_set_text(tl_charge, buf);
+	static char buf[] = "1234567890";
+	// snprintf(buf, sizeof(buf), "%d %d\n%d%%", charge_state.is_plugged, charge_state.is_charging, charge_state.charge_percent);
+	snprintf(buf, sizeof(buf), "%d%% %c", charge_state.charge_percent, charge_state.is_charging ? 'c' : charge_state.is_plugged ? 'p' : ' ');
+	// test code
+	// text_layer_set_text(tl_charge, "100%");
+	text_layer_set_text(tl_charge, buf);
 }
 
 void update_bitmap() {
-  if (bitmap != 0) {
-    gbitmap_destroy(bitmap);
-    bitmap = 0;
-  }
-  bitmap = gbitmap_create_with_resource(bitmap_IDs[currentImage]);
-  bitmap_layer_set_bitmap(bitmap_layer, bitmap);
+	if (bitmap != 0) {
+		gbitmap_destroy(bitmap);
+		bitmap = 0;
+	}
+	bitmap = gbitmap_create_with_resource(bitmap_IDs[currentImage]);
+	bitmap_layer_set_bitmap(bitmap_layer, bitmap);
 }
 
 void tick_handler_minutes(struct tm *tick_time, TimeUnits units_changed) {
-  update_time();
-  if (tick_time->tm_min == 0) {
-    // change the bitmap each hour
-    ++currentImage;
-    currentImage %= NUM_BITMAPS;
-    update_bitmap();
-    update_date();
-  }
+	update_time();
+	if (tick_time->tm_min == 0) {
+		// change the bitmap each hour
+		++currentImage;
+		currentImage %= NUM_BITMAPS;
+		update_bitmap();
+		update_date();
+	}
+	if (tl_msg != 0) {
+		text_layer_destroy(tl_msg);
+		tl_msg = 0;
+	}
 }
 
-void inboxReceived(DictionaryIterator *iterator, void *context) {
+void check_tl_msg() {
+	if (tl_msg == 0) {
+		tl_msg = text_layer_create(GRect(22, 34, 100, 100));
+		text_layer_set_background_color(tl_msg, GColorBlack);
+		text_layer_set_text_color(tl_msg, GColorWhite);
+		text_layer_set_font(tl_msg, font_rebellion_14);
+		text_layer_set_text_alignment(tl_msg, GTextAlignmentLeft);
+		text_layer_set_overflow_mode(tl_msg, GTextOverflowModeWordWrap);
+		layer_add_child(window_get_root_layer(window), text_layer_get_layer(tl_msg));
+	}
+}
+
+void inbox_received_handler(DictionaryIterator *iterator, void *context) {
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "inboxReceived");
+	check_tl_msg();
+
+	static char s_msg_result[32];
+	Tuple *t = dict_read_first(iterator);
+	while (t != NULL) {
+		if (t->key == 0) {
+			DictionaryIterator * pDictIter;
+			if (app_message_outbox_begin(&pDictIter) != APP_MSG_OK) {
+				APP_LOG(APP_LOG_LEVEL_ERROR, "Could not get DictionaryIterator for MSGKEY_LOCALE_GET");
+			}
+			dict_write_cstring(pDictIter, 0, current_locale); // MSGKEY_LOCALE_GET
+			dict_write_end(pDictIter);
+			AppMessageResult res = app_message_outbox_send();
+			snprintf(s_msg_result, 33, "get locale %d", res);
+			text_layer_set_text(tl_msg, s_msg_result);
+		} else if (t->key == 1) {
+			char message[32] = "set locale to ";
+			strcpy(&message[14], t->value->cstring);
+			text_layer_set_text(tl_msg, message);
+		}
+		// Get next pair, if any
+    	t = dict_read_next(iterator);
+	}
 }
 
-void inboxDropped(AppMessageResult reason, void *context) {
+void inbox_dropped_handler(AppMessageResult reason, void *context) {
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "inboxDropped");
+	check_tl_msg();
 }
 
-void outboxSent(DictionaryIterator *iterator, void *context) {
+void outbox_sent_handler(DictionaryIterator *iterator, void *context) {
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "outboxSent");
+	check_tl_msg();
 }
 
-void outboxFailed(DictionaryIterator *iterator, AppMessageResult reason, void *context) {
+void outbox_failed_handler(DictionaryIterator *iterator, AppMessageResult reason, void *context) {
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "outboxFailed");
+	check_tl_msg();
 }
 
 void main_window_load(Window *window) {
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "main_window_load");
-
-  /*
-  ++n_window_loads;
-  char* str = 0;
-  switch (n_window_loads % 10) {
-    case 1: str = str_st; break;
-    case 2: str = str_nd; break;
-    case 3: str = str_rd; break;
-    default: str = str_th; break;
-  }
-  snprintf(str_main, 33, fmt_main, n_window_loads, str);
   
-  text_layer = text_layer_create(GRect(0, 0, 144, 60));
-	// Set the text, font, and text alignment
-	text_layer_set_text(text_layer, str_main);
-	text_layer_set_font(text_layer, fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD));
-	text_layer_set_text_alignment(text_layer, GTextAlignmentCenter);
-  text_layer_set_overflow_mode(text_layer, GTextOverflowModeWordWrap);
-	// Add the text layer to the window
-	layer_add_child(window_get_root_layer(window), text_layer_get_layer(text_layer));
-  */
+	// create fonts
+	font_rebellion_14 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_KEY_REBELLION_14));
+	font_rebellion_28 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_KEY_REBELLION_28));
   
-  // create fonts
-  font_rebellion_14 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_KEY_REBELLION_14));
-  font_rebellion_28 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_KEY_REBELLION_28));
-  
-  // create bluetooth info layer
-  tl_bt = text_layer_create(GRect(0, 0, 60, 16));
-  text_layer_set_background_color(tl_bt, GColorClear);
+	// create bluetooth info layer
+	tl_bt = text_layer_create(GRect(0, 0, 60, 16));
+	text_layer_set_background_color(tl_bt, GColorClear);
 	text_layer_set_font(tl_bt, font_rebellion_14);
 	text_layer_set_text_alignment(tl_bt, GTextAlignmentLeft);
 	layer_add_child(window_get_root_layer(window), text_layer_get_layer(tl_bt));
   
-  // create charge state info layer
-  tl_charge = text_layer_create(GRect(0, 16, 60, 16));
-  text_layer_set_background_color(tl_charge, GColorClear);
+	// create charge state info layer
+	tl_charge = text_layer_create(GRect(0, 16, 60, 16));
+	text_layer_set_background_color(tl_charge, GColorClear);
 	text_layer_set_font(tl_charge, font_rebellion_14);
 	text_layer_set_text_alignment(tl_charge, GTextAlignmentLeft);
-  text_layer_set_overflow_mode(tl_charge, GTextOverflowModeWordWrap);
+	text_layer_set_overflow_mode(tl_charge, GTextOverflowModeWordWrap);
 	layer_add_child(window_get_root_layer(window), text_layer_get_layer(tl_charge));
 
-  // create time info layer
-  tl_time = text_layer_create(GRect(40, 0, 104, 32));
-  text_layer_set_background_color(tl_time, GColorClear);
+	// create time info layer
+	tl_time = text_layer_create(GRect(40, 0, 104, 32));
+	text_layer_set_background_color(tl_time, GColorClear);
 	text_layer_set_font(tl_time, font_rebellion_28);
 	text_layer_set_text_alignment(tl_time, GTextAlignmentRight);
 	layer_add_child(window_get_root_layer(window), text_layer_get_layer(tl_time));
 
-  // create date info layer
-  tl_date = text_layer_create(GRect(0, 32, 144, 16));
-  text_layer_set_background_color(tl_date, GColorClear);
+	// create date info layer
+	tl_date = text_layer_create(GRect(0, 32, 144, 16));
+	text_layer_set_background_color(tl_date, GColorClear);
 	text_layer_set_font(tl_date, font_rebellion_14);
 	text_layer_set_text_alignment(tl_date, GTextAlignmentRight);
-  // text_layer_set_overflow_mode(tl_date, GTextOverflowModeWordWrap);
+	// text_layer_set_overflow_mode(tl_date, GTextOverflowModeWordWrap);
 	layer_add_child(window_get_root_layer(window), text_layer_get_layer(tl_date));
 
-  // create bitmap layer
-  bitmap_layer = bitmap_layer_create(GRect(0, 48, 144, 120));
-  bitmap_layer_set_background_color(bitmap_layer, GColorWhite);
-  bitmap_layer_set_alignment(bitmap_layer, GAlignBottomRight);
-  // bitmap_layer_set_compositing_mode(bitmap_layer, GCompOpAssignInverted);
-  bitmap_layer_set_compositing_mode(bitmap_layer, GCompOpAssign);
-  layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(bitmap_layer));
+	// create bitmap layer
+	bitmap_layer = bitmap_layer_create(GRect(0, 48, 144, 120));
+	bitmap_layer_set_background_color(bitmap_layer, GColorWhite);
+	bitmap_layer_set_alignment(bitmap_layer, GAlignBottomRight);
+	// bitmap_layer_set_compositing_mode(bitmap_layer, GCompOpAssignInverted);
+	bitmap_layer_set_compositing_mode(bitmap_layer, GCompOpAssign);
+	layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(bitmap_layer));
   
-  // update all info layers's texts
-  update_bt(bluetooth_connection_service_peek());
-  update_charge(battery_state_service_peek());
-  update_time();
-  update_date();
-  time_t temp = time(NULL); 
-  struct tm *tick_time = localtime(&temp);
-  currentImage = tick_time->tm_hour % NUM_BITMAPS;
-  update_bitmap();
+	// update all info layers's texts
+	update_bt(bluetooth_connection_service_peek());
+	update_charge(battery_state_service_peek());
+	update_time();
+	update_date();
+	time_t temp = time(NULL); 
+	struct tm *tick_time = localtime(&temp);
+	currentImage = tick_time->tm_hour % NUM_BITMAPS;
+	update_bitmap();
   
-  // subscribe to services
-  tick_timer_service_subscribe(MINUTE_UNIT, tick_handler_minutes);
-  bluetooth_connection_service_subscribe(update_bt);
-  battery_state_service_subscribe(update_charge);
-  app_message_register_inbox_received(inboxReceived);
-  app_message_register_inbox_dropped(inboxDropped);
-  app_message_register_outbox_sent(outboxSent);
-  app_message_register_outbox_failed(outboxFailed);
+	// subscribe to services
+	tick_timer_service_subscribe(MINUTE_UNIT, tick_handler_minutes);
+	bluetooth_connection_service_subscribe(update_bt);
+	battery_state_service_subscribe(update_charge);
+	app_message_register_inbox_received(inbox_received_handler);
+	app_message_register_inbox_dropped(inbox_dropped_handler);
+	app_message_register_outbox_sent(outbox_sent_handler);
+	app_message_register_outbox_failed(outbox_failed_handler);
+	if (app_message_open(32,32) != APP_MSG_OK) {
+		APP_LOG(APP_LOG_LEVEL_ERROR, "Could not allocate app message buffers!");
+	}
   
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "loaded");
 }
@@ -258,16 +267,20 @@ void main_window_unload(Window *window) {
 	text_layer_destroy(tl_time);
 	text_layer_destroy(tl_bt);
 	text_layer_destroy(tl_charge);
-  gbitmap_destroy(bitmap);
-  bitmap = 0;
-  bitmap_layer_destroy(bitmap_layer);
-  fonts_unload_custom_font(font_rebellion_14);
-  fonts_unload_custom_font(font_rebellion_28);
+	if (tl_msg != 0) {
+		text_layer_destroy(tl_msg);
+		tl_msg = 0;
+	}
+	gbitmap_destroy(bitmap);
+	bitmap = 0;
+	bitmap_layer_destroy(bitmap_layer);
+	fonts_unload_custom_font(font_rebellion_14);
+	fonts_unload_custom_font(font_rebellion_28);
   
-  tick_timer_service_unsubscribe();
-  bluetooth_connection_service_unsubscribe();
-  battery_state_service_unsubscribe();
-  app_message_deregister_callbacks();
+	tick_timer_service_unsubscribe();
+	bluetooth_connection_service_unsubscribe();
+	battery_state_service_unsubscribe();
+	app_message_deregister_callbacks();
 
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "unloaded");
 }
@@ -277,10 +290,10 @@ void init(void) {
 
 	// Create a window and text layer
 	window = window_create();
-  window_set_window_handlers(window, (WindowHandlers) {
-    .load = main_window_load,
-    .unload = main_window_unload
-  });
+	window_set_window_handlers(window, (WindowHandlers) {
+		.load = main_window_load,
+		.unload = main_window_unload
+	});
 	// Push the window
 	window_stack_push(window, true);
 
@@ -290,10 +303,10 @@ void init(void) {
 void deinit(void) {	
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "deinit");
 
-  // Destroy the window
+	// Destroy the window
 	window_destroy(window);
 
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "deinitialized");
+	APP_LOG(APP_LOG_LEVEL_DEBUG, "deinitialized");
 }
 
 int main(void) {

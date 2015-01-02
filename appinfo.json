@@ -1,6 +1,7 @@
 {
     "appKeys": {
-        "MSGKEY_LOCALE": 0
+        "MSGKEY_LOCALE_GET": 0,
+        "MSGKEY_LOCALE_SET": 1
     },
     "capabilities": [
         "configurable"
