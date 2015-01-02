@@ -8,7 +8,6 @@ TextLayer *tl_time = 0;
 TextLayer *tl_date = 0;
 TextLayer *tl_bt = 0;
 TextLayer *tl_charge = 0;
-TextLayer *tl_msg = 0;
 GBitmap *bitmap = 0;
 BitmapLayer *bitmap_layer = 0;
 GFont font_rebellion_28;
@@ -130,45 +129,39 @@ void tick_handler_minutes(struct tm *tick_time, TimeUnits units_changed) {
 		update_bitmap();
 		update_date();
 	}
-	if (tl_msg != 0) {
-		text_layer_destroy(tl_msg);
-		tl_msg = 0;
-	}
-}
-
-void check_tl_msg() {
-	if (tl_msg == 0) {
-		tl_msg = text_layer_create(GRect(22, 34, 100, 100));
-		text_layer_set_background_color(tl_msg, GColorBlack);
-		text_layer_set_text_color(tl_msg, GColorWhite);
-		text_layer_set_font(tl_msg, font_rebellion_14);
-		text_layer_set_text_alignment(tl_msg, GTextAlignmentLeft);
-		text_layer_set_overflow_mode(tl_msg, GTextOverflowModeWordWrap);
-		layer_add_child(window_get_root_layer(window), text_layer_get_layer(tl_msg));
-	}
 }
 
 void inbox_received_handler(DictionaryIterator *iterator, void *context) {
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "inboxReceived");
-	check_tl_msg();
 
 	static char s_msg_result[32];
 	Tuple *t = dict_read_first(iterator);
 	while (t != NULL) {
-		if (t->key == 0) {
+		if (t->key == MSG_KEY_LOCALE_GET) {
 			DictionaryIterator * pDictIter;
 			if (app_message_outbox_begin(&pDictIter) != APP_MSG_OK) {
 				APP_LOG(APP_LOG_LEVEL_ERROR, "Could not get DictionaryIterator for MSGKEY_LOCALE_GET");
 			}
-			dict_write_cstring(pDictIter, 0, current_locale); // MSGKEY_LOCALE_GET
+			dict_write_cstring(pDictIter, MSG_KEY_LOCALE_GET, current_locale);
 			dict_write_end(pDictIter);
 			AppMessageResult res = app_message_outbox_send();
-			snprintf(s_msg_result, 33, "get locale %d", res);
-			text_layer_set_text(tl_msg, s_msg_result);
-		} else if (t->key == 1) {
-			char message[32] = "set locale to ";
-			strcpy(&message[14], t->value->cstring);
-			text_layer_set_text(tl_msg, message);
+			snprintf(s_msg_result, 32, "get locale %d", res);
+		} else if (t->key == MSG_KEY_LOCALE_SET) {
+			char* loc = t->value->cstring;
+			if (strlen(loc) == 0 || strcmp(t->value->cstring, "sys") == 0) {
+				persist_delete(PERSISTENCE_ID_LOCALE);
+				APP_LOG(APP_LOG_LEVEL_DEBUG, "Reset locale to system default");
+				update_locale();
+				update_date();
+				update_time();
+			} else if (strcmp(t->value->cstring, "de") == 0 || strcmp(t->value->cstring, "en") == 0 || strcmp(t->value->cstring, "fr") == 0) {
+				persist_write_string(PERSISTENCE_ID_LOCALE, loc);
+				snprintf(s_msg_result, 32, "Setting locale to %s", loc);
+				APP_LOG(APP_LOG_LEVEL_DEBUG, s_msg_result);
+				update_locale();
+				update_date();
+				update_time();
+			}
 		}
 		// Get next pair, if any
     	t = dict_read_next(iterator);
@@ -177,17 +170,14 @@ void inbox_received_handler(DictionaryIterator *iterator, void *context) {
 
 void inbox_dropped_handler(AppMessageResult reason, void *context) {
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "inboxDropped");
-	check_tl_msg();
 }
 
 void outbox_sent_handler(DictionaryIterator *iterator, void *context) {
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "outboxSent");
-	check_tl_msg();
 }
 
 void outbox_failed_handler(DictionaryIterator *iterator, AppMessageResult reason, void *context) {
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "outboxFailed");
-	check_tl_msg();
 }
 
 void main_window_load(Window *window) {
@@ -267,10 +257,6 @@ void main_window_unload(Window *window) {
 	text_layer_destroy(tl_time);
 	text_layer_destroy(tl_bt);
 	text_layer_destroy(tl_charge);
-	if (tl_msg != 0) {
-		text_layer_destroy(tl_msg);
-		tl_msg = 0;
-	}
 	gbitmap_destroy(bitmap);
 	bitmap = 0;
 	bitmap_layer_destroy(bitmap_layer);
