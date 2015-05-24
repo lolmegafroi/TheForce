@@ -105,7 +105,7 @@ void update_bt(bool connected) {
 void update_charge(BatteryChargeState charge_state) {
 	static char buf[] = "1234567890";
 	// snprintf(buf, sizeof(buf), "%d %d\n%d%%", charge_state.is_plugged, charge_state.is_charging, charge_state.charge_percent);
-	snprintf(buf, sizeof(buf), "%d%% %c", charge_state.charge_percent, charge_state.is_charging ? 'c' : charge_state.is_plugged ? 'p' : ' ');
+	snprintf(buf, sizeof(buf), "%d%%\n%c", charge_state.charge_percent, charge_state.is_charging ? 'c' : charge_state.is_plugged ? 'p' : ' ');
 	// test code
 	// text_layer_set_text(tl_charge, "100%");
 	text_layer_set_text(tl_charge, buf);
@@ -195,7 +195,7 @@ void main_window_load(Window *window) {
 	layer_add_child(window_get_root_layer(window), text_layer_get_layer(tl_bt));
   
 	// create charge state info layer
-	tl_charge = text_layer_create(GRect(0, 16, 60, 16));
+	tl_charge = text_layer_create(GRect(0, 16, 60, 32));
 	text_layer_set_background_color(tl_charge, GColorClear);
 	text_layer_set_font(tl_charge, font_rebellion_14);
 	text_layer_set_text_alignment(tl_charge, GTextAlignmentLeft);

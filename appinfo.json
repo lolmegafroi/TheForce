@@ -66,10 +66,11 @@
             }
         ]
     },
+    "sdkVersion": "2",
     "shortName": "The Force",
     "uuid": "0e3557a2-fa9a-4b79-b6c8-8aa2a4f8427a",
     "versionCode": 1,
-    "versionLabel": "0.3",
+    "versionLabel": "0.5",
     "watchapp": {
         "watchface": true
     }
