@@ -24,15 +24,29 @@ typedef struct {
 } font_configuration;
 font_configuration font_conf;
 
-char* const str_time = "00:00";
 // weekdays: double-array map from locale to weekday name
 // current supported locales are: en, de, fr
 const char weekdays[3][7][3] = {{"Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"},\
 {"So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"},\
 {"Di", "Lu", "Ma", "Me", "Je", "Ve", "Sa"}};
-char* const current_locale = "12-34";
+const char tolower_table[] = {
+	0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+	20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
+	40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
+	60, 61, 62, 63, 64, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111,
+	112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 91, 92, 93, 94, 95, 96, 97, 98, 99,
+	100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119,
+	120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139,
+	140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159,
+	160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179,
+	180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199,
+	200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219,
+	220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239,
+	240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255
+};
+char* const current_locale = "1234567890";
+const size_t current_locale_max = 11;
 int current_lang = 0;
-const char tolower_table[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255};
 
 // persistence constants
 const uint32_t PERSISTENCE_ID_LOCALE = 0;
@@ -45,13 +59,19 @@ const uint32_t PERSISTENCE_ID_FONT   = 1;
 #define MSG_KEY_FONT_SET         3
 
 void update_time() {
+	static char* const str_time = "00:00:00";
+	static const size_t str_time_max = 9;
 	// Get a tm structure
 	time_t temp = time(NULL); 
 	struct tm *tick_time = localtime(&temp);
+	size_t ret;
 	if(clock_is_24h_style() == true) { // Use 24 hour format
-		strftime(str_time, sizeof(str_time), "%H:%M", tick_time);
+		ret = strftime(str_time, str_time_max, "%H:%M", tick_time);
 	} else { // Use 12 hour format
-		strftime(str_time, sizeof(str_time), "%I:%M", tick_time);
+		ret = strftime(str_time, str_time_max, "%P %I:%M", tick_time);
+	}
+	if (ret == 0) {
+		APP_LOG(APP_LOG_LEVEL_ERROR, "Error getting time");
 	}
 	// test code
 	// text_layer_set_text(tl_time, "56:78");
@@ -73,11 +93,13 @@ void update_locale() {
 	} else {
 		strcpy(current_locale, loc);
 	}
+	APP_LOG(APP_LOG_LEVEL_INFO, current_locale);
 	char* p = current_locale;
 	for ( ; *p; ++p) {
 		*p = tolower_table[(uint8_t)*p];
 	}
 	current_lang = 0;
+	APP_LOG(APP_LOG_LEVEL_INFO, current_locale);
 	if(strcmp(current_locale, "de") == 0) {
 		current_lang = 1;
 	} else if (strcmp(current_locale, "fr") == 0) {
@@ -93,9 +115,9 @@ void update_date() {
 	const char* wd = weekdays[current_lang][lt->tm_wday];
 	char* fmt_date = 0;
 	switch (current_lang) {
-		case 1:
-		case 2: fmt_date = "dd %d.%m.%Y"; break;
-		default: fmt_date = "dd %m/%d/%Y";
+		case 1: APP_LOG(APP_LOG_LEVEL_INFO, "1"); fmt_date = "dd %d.%m.%Y"; break;
+		case 2: APP_LOG(APP_LOG_LEVEL_INFO, "2"); fmt_date = "dd %d.%m.%Y"; break;
+		default: APP_LOG(APP_LOG_LEVEL_INFO, "0"); fmt_date = "dd %m/%d/%Y";
 	}
 	strftime(str_date, 21, fmt_date, lt);
 	str_date[0] = wd[0];
@@ -229,6 +251,8 @@ void inbox_received_handler(DictionaryIterator *iterator, void *context) {
 				update_locale();
 				update_date();
 				update_time();
+			} else {
+				APP_LOG(APP_LOG_LEVEL_ERROR, "Unrecognized locale to set!");
 			}
 		} else if (t->key == MSG_KEY_FONT_SET) {
 			char* font = t->value->cstring;
@@ -273,13 +297,13 @@ void main_window_load(Window *window) {
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "main_window_load");
 
 	// create bluetooth info layer
-	tl_bt = text_layer_create(GRect(0, 0, 60, 16));
+	tl_bt = text_layer_create(GRect(0, 0, 40, 16));
 	text_layer_set_background_color(tl_bt, GColorClear);
 	text_layer_set_text_alignment(tl_bt, GTextAlignmentLeft);
 	layer_add_child(window_get_root_layer(window), text_layer_get_layer(tl_bt));
   
 	// create charge state info layer
-	tl_charge = text_layer_create(GRect(0, 16, 60, 32));
+	tl_charge = text_layer_create(GRect(0, 16, 40, 32));
 	text_layer_set_background_color(tl_charge, GColorClear);
 	text_layer_set_text_alignment(tl_charge, GTextAlignmentLeft);
 	text_layer_set_overflow_mode(tl_charge, GTextOverflowModeWordWrap);
@@ -292,10 +316,9 @@ void main_window_load(Window *window) {
 	layer_add_child(window_get_root_layer(window), text_layer_get_layer(tl_time));
 
 	// create date info layer
-	tl_date = text_layer_create(GRect(0, 32, 144, 16));
+	tl_date = text_layer_create(GRect(20, 32, 124, 16));
 	text_layer_set_background_color(tl_date, GColorClear);
 	text_layer_set_text_alignment(tl_date, GTextAlignmentRight);
-	// text_layer_set_overflow_mode(tl_date, GTextOverflowModeWordWrap);
 	layer_add_child(window_get_root_layer(window), text_layer_get_layer(tl_date));
 
 	// create bitmap layer
