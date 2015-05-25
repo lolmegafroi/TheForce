@@ -11,7 +11,7 @@ Pebble.addEventListener('ready', function(e) {
 			console.log('Successfully requested current locale and font');
 		},
 		function(e) {
-			console.log('Unable to request current locale and/or font. Error is: ' + e.error.message);
+			console.log('Unable to request current locale and/or font. Error is: ' + e);
 		}
 	);
 	initialized = true;

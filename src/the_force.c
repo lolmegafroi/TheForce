@@ -14,7 +14,7 @@ const unsigned int NUM_BITMAPS = 7;
 unsigned int currentImage = 0;
 const uint32_t bitmap_IDs[] = {RESOURCE_ID_star_wars, RESOURCE_ID_darth_vader, RESOURCE_ID_han_solo, RESOURCE_ID_boba_fett, RESOURCE_ID_millenium_falcon, RESOURCE_ID_death_star, RESOURCE_ID_jabba};
 
-const char** const fonts = {"sys", "rebellion", "scp-regular", "scp-bold"};
+const char* fonts[] = {"sys", "rebellion", "scp-regular", "scp-bold"};
 #define NUM_FONTS 4
 typedef struct {
 	GFont font_14;
@@ -240,6 +240,9 @@ void inbox_received_handler(DictionaryIterator *iterator, void *context) {
 					break;
 				}
 			}
+			if (font_conf.next_font >= 0) {
+				persist_write_int(PERSISTENCE_ID_FONT, font_conf.next_font);
+			}
 			update_fonts();
 		}
 		// Get next pair, if any
@@ -306,7 +309,7 @@ void main_window_load(Window *window) {
 	// create and set fonts
 	font_conf.current_font = -1;
 	if (persist_exists(PERSISTENCE_ID_FONT)) {
-		font_conf.next_conf = persist_read_int(PERSISTENCE_ID_FONT);
+		font_conf.next_font = persist_read_int(PERSISTENCE_ID_FONT);
 	} else {
 		font_conf.next_font = 0;
 	}

@@ -14,15 +14,62 @@
     "resources": {
         "media": [
             {
+                "file": "images/star_wars_logo.png",
+                "name": "star_wars",
+                "type": "png"
+            },
+            {
+                "file": "images/boba_fett.png",
+                "name": "boba_fett",
+                "type": "png"
+            },
+            {
+                "file": "images/darth_vader.png",
+                "name": "darth_vader",
+                "type": "png"
+            },
+            {
+                "file": "images/han_solo.png",
+                "name": "han_solo",
+                "type": "png"
+            },
+            {
+                "file": "images/the_force_logo.png",
+                "menuIcon": true,
+                "name": "the_force_logo",
+                "type": "png"
+            },
+            {
                 "characterRegex": "[0-9a-zA-Z %.:,;\\/\\-_]",
-                "file": "fonts/SourceCodePro-Bold14.ttf",
-                "name": "FONTS_KEY_SOURCECODEPRO_BOLD_14",
+                "file": "fonts/Rebellion14.ttf",
+                "name": "FONTS_KEY_REBELLION_14",
                 "type": "font"
             },
             {
                 "characterRegex": "[0-9a-zA-Z %.:,;\\/\\-_]",
-                "file": "fonts/SourceCodePro-Bold14.ttf",
-                "name": "FONTS_KEY_SOURCECODEPRO_BOLD_28",
+                "file": "fonts/Rebellion14.ttf",
+                "name": "FONTS_KEY_REBELLION_28",
+                "type": "font"
+            },
+            {
+                "file": "images/death_star.png",
+                "name": "death_star",
+                "type": "png"
+            },
+            {
+                "file": "images/millenium-falcon.png",
+                "name": "millenium_falcon",
+                "type": "png"
+            },
+            {
+                "file": "images/jabba.png",
+                "name": "jabba",
+                "type": "png"
+            },
+            {
+                "characterRegex": "[0-9a-zA-Z %.:,;\\/\\-_]",
+                "file": "fonts/SourceCodePro-Regular14.ttf",
+                "name": "FONTS_KEY_SOURCECODEPRO_REGULAR_14",
                 "type": "font"
             },
             {
@@ -33,62 +80,15 @@
             },
             {
                 "characterRegex": "[0-9a-zA-Z %.:,;\\/\\-_]",
-                "file": "fonts/SourceCodePro-Regular14.ttf",
-                "name": "FONTS_KEY_SOURCECODEPRO_REGULAR_14",
-                "type": "font"
-            },
-            {
-                "file": "images/jabba.png",
-                "name": "jabba",
-                "type": "png"
-            },
-            {
-                "file": "images/millenium-falcon.png",
-                "name": "millenium_falcon",
-                "type": "png"
-            },
-            {
-                "file": "images/death_star.png",
-                "name": "death_star",
-                "type": "png"
-            },
-            {
-                "characterRegex": "[0-9a-zA-Z %.:,;\\/\\-_]",
-                "file": "fonts/Rebellion14.ttf",
-                "name": "FONTS_KEY_REBELLION_28",
+                "file": "fonts/SourceCodePro-Bold14.ttf",
+                "name": "FONTS_KEY_SOURCECODEPRO_BOLD_28",
                 "type": "font"
             },
             {
                 "characterRegex": "[0-9a-zA-Z %.:,;\\/\\-_]",
-                "file": "fonts/Rebellion14.ttf",
-                "name": "FONTS_KEY_REBELLION_14",
+                "file": "fonts/SourceCodePro-Bold14.ttf",
+                "name": "FONTS_KEY_SOURCECODEPRO_BOLD_14",
                 "type": "font"
-            },
-            {
-                "file": "images/the_force_logo.png",
-                "menuIcon": true,
-                "name": "the_force_logo",
-                "type": "png"
-            },
-            {
-                "file": "images/han_solo.png",
-                "name": "han_solo",
-                "type": "png"
-            },
-            {
-                "file": "images/darth_vader.png",
-                "name": "darth_vader",
-                "type": "png"
-            },
-            {
-                "file": "images/boba_fett.png",
-                "name": "boba_fett",
-                "type": "png"
-            },
-            {
-                "file": "images/star_wars_logo.png",
-                "name": "star_wars",
-                "type": "png"
             }
         ]
     },
