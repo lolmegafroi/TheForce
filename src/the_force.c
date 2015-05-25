@@ -3,33 +3,46 @@
 // pebble display size is 144 * 168 (width * height)
 
 Window *window;
-// TextLayer *text_layer;
 TextLayer *tl_time = 0;
 TextLayer *tl_date = 0;
 TextLayer *tl_bt = 0;
 TextLayer *tl_charge = 0;
-GBitmap *bitmap = 0;
 BitmapLayer *bitmap_layer = 0;
-GFont font_rebellion_28;
-GFont font_rebellion_14;
+
+GBitmap *bitmap = 0;
 const unsigned int NUM_BITMAPS = 7;
-char str_time[] = "00:00";
 unsigned int currentImage = 0;
-uint32_t bitmap_IDs[] = {RESOURCE_ID_star_wars, RESOURCE_ID_darth_vader, RESOURCE_ID_han_solo, RESOURCE_ID_boba_fett, RESOURCE_ID_millenium_falcon, RESOURCE_ID_death_star, RESOURCE_ID_jabba};
+const uint32_t bitmap_IDs[] = {RESOURCE_ID_star_wars, RESOURCE_ID_darth_vader, RESOURCE_ID_han_solo, RESOURCE_ID_boba_fett, RESOURCE_ID_millenium_falcon, RESOURCE_ID_death_star, RESOURCE_ID_jabba};
+
+const char** const fonts = {"sys", "rebellion", "scp-regular", "scp-bold"};
+#define NUM_FONTS 4
+typedef struct {
+	GFont font_14;
+	GFont font_28;
+	int current_font;
+	int next_font;
+} font_configuration;
+font_configuration font_conf;
+
+char* const str_time = "00:00";
 // weekdays: double-array map from locale to weekday name
+// current supported locales are: en, de, fr
 const char weekdays[3][7][3] = {{"Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"},\
 {"So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"},\
 {"Di", "Lu", "Ma", "Me", "Je", "Ve", "Sa"}};
-char* current_locale = "12"; // ONLY STORE 2-letter LOCALES!
+char* const current_locale = "12-34";
 int current_lang = 0;
-char tolower_table[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255};
+const char tolower_table[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255};
 
 // persistence constants
 const uint32_t PERSISTENCE_ID_LOCALE = 0;
+const uint32_t PERSISTENCE_ID_FONT   = 1;
 
 // message constants
-#define MSG_KEY_LOCALE_GET 0
-#define MSG_KEY_LOCALE_SET 1
+#define MSG_KEY_LOCALE_GET       0
+#define MSG_KEY_LOCALE_SET       1
+#define MSG_KEY_FONT_GET         2
+#define MSG_KEY_FONT_SET         3
 
 void update_time() {
 	// Get a tm structure
@@ -120,6 +133,55 @@ void update_bitmap() {
 	bitmap_layer_set_bitmap(bitmap_layer, bitmap);
 }
 
+void update_fonts() {
+	switch (font_conf.current_font) {
+		case -1:
+		case 0:
+			break;
+		case 1: // rebellion
+		case 2: // source code pro regular
+		case 3: // source code pro bold
+			fonts_unload_custom_font(font_conf.font_14);
+			fonts_unload_custom_font(font_conf.font_28);
+			break;
+		default:
+			APP_LOG(APP_LOG_LEVEL_ERROR, "Unknown current font!");
+	}
+	bool doSetFont = true;
+	switch (font_conf.next_font) {
+		case -1:
+			// do not set a new font - used e.g. for shutting down
+			doSetFont = false;
+			break;
+		case 0:
+			font_conf.font_14 = fonts_get_system_font(FONT_KEY_GOTHIC_14);
+			font_conf.font_28 = fonts_get_system_font(FONT_KEY_GOTHIC_28);
+			break;
+		case 1:
+			font_conf.font_14 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONTS_KEY_REBELLION_14));
+			font_conf.font_28 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONTS_KEY_REBELLION_28));
+			break;
+		case 2:
+			font_conf.font_14 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONTS_KEY_SOURCECODEPRO_REGULAR_14));
+			font_conf.font_28 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONTS_KEY_SOURCECODEPRO_REGULAR_28));
+			break;
+		case 3:
+			font_conf.font_14 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONTS_KEY_SOURCECODEPRO_BOLD_14));
+			font_conf.font_28 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONTS_KEY_SOURCECODEPRO_BOLD_28));
+			break;
+		default:
+			APP_LOG(APP_LOG_LEVEL_ERROR, "Unknown next font!");
+			doSetFont = false;
+	}
+	if (doSetFont) {
+		text_layer_set_font(tl_bt,      font_conf.font_14);
+		text_layer_set_font(tl_charge,  font_conf.font_14);
+		text_layer_set_font(tl_time,    font_conf.font_28);
+		text_layer_set_font(tl_date,    font_conf.font_14);
+		font_conf.current_font = font_conf.next_font;
+	}
+}
+
 void tick_handler_minutes(struct tm *tick_time, TimeUnits units_changed) {
 	update_time();
 	if (tick_time->tm_min == 0) {
@@ -134,38 +196,62 @@ void tick_handler_minutes(struct tm *tick_time, TimeUnits units_changed) {
 void inbox_received_handler(DictionaryIterator *iterator, void *context) {
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "inboxReceived");
 
-	static char s_msg_result[32];
+	static char s_msg_result[160];
+	int idx_msg_result = 0;
+	DictionaryIterator * pDictIter = NULL;
 	Tuple *t = dict_read_first(iterator);
 	while (t != NULL) {
 		if (t->key == MSG_KEY_LOCALE_GET) {
-			DictionaryIterator * pDictIter;
-			if (app_message_outbox_begin(&pDictIter) != APP_MSG_OK) {
+			if (pDictIter == NULL && (app_message_outbox_begin(&pDictIter) != APP_MSG_OK)) {
 				APP_LOG(APP_LOG_LEVEL_ERROR, "Could not get DictionaryIterator for MSGKEY_LOCALE_GET");
+			} else {
+				dict_write_cstring(pDictIter, MSG_KEY_LOCALE_GET, current_locale);
+				idx_msg_result += snprintf(s_msg_result + idx_msg_result, 32, "[get locale:%s]", current_locale);
 			}
-			dict_write_cstring(pDictIter, MSG_KEY_LOCALE_GET, current_locale);
-			dict_write_end(pDictIter);
-			AppMessageResult res = app_message_outbox_send();
-			snprintf(s_msg_result, 32, "get locale %d", res);
+		} else if (t->key == MSG_KEY_FONT_GET) {
+			if (pDictIter == NULL && (app_message_outbox_begin(&pDictIter) != APP_MSG_OK)) {
+				APP_LOG(APP_LOG_LEVEL_ERROR, "Could not get DictionaryIterator for MSGKEY_LOCALE_GET");
+			} else {
+				dict_write_cstring(pDictIter, MSG_KEY_FONT_GET, fonts[font_conf.current_font]);
+				idx_msg_result += snprintf(s_msg_result + idx_msg_result, 32, "[get font:%s]", fonts[font_conf.current_font]);
+			}
 		} else if (t->key == MSG_KEY_LOCALE_SET) {
 			char* loc = t->value->cstring;
-			if (strlen(loc) == 0 || strcmp(t->value->cstring, "sys") == 0) {
+			if (strlen(loc) == 0 || strcmp(loc, "sys") == 0) {
 				persist_delete(PERSISTENCE_ID_LOCALE);
-				APP_LOG(APP_LOG_LEVEL_DEBUG, "Reset locale to system default");
+				idx_msg_result += snprintf(s_msg_result + idx_msg_result, 32, "[reset locale:%s]", loc);
 				update_locale();
 				update_date();
 				update_time();
-			} else if (strcmp(t->value->cstring, "de") == 0 || strcmp(t->value->cstring, "en") == 0 || strcmp(t->value->cstring, "fr") == 0) {
+			} else if (strcmp(loc, "de") == 0 || strcmp(loc, "en") == 0 || strcmp(loc, "fr") == 0) {
 				persist_write_string(PERSISTENCE_ID_LOCALE, loc);
-				snprintf(s_msg_result, 32, "Setting locale to %s", loc);
-				APP_LOG(APP_LOG_LEVEL_DEBUG, s_msg_result);
+				idx_msg_result += snprintf(s_msg_result + idx_msg_result, 32, "[set locale:%s]", loc);
 				update_locale();
 				update_date();
 				update_time();
 			}
+		} else if (t->key == MSG_KEY_FONT_SET) {
+			char* font = t->value->cstring;
+			font_conf.next_font = -1; // do nothing if setting is not recognized
+			for (short i = 0; i < NUM_FONTS; ++i) {
+				if (strcmp(font, fonts[i]) == 0) {
+					font_conf.next_font = i;
+					idx_msg_result += snprintf(s_msg_result + idx_msg_result, 32, "[set font:%s]", fonts[font_conf.next_font]);
+					break;
+				}
+			}
+			update_fonts();
 		}
 		// Get next pair, if any
     	t = dict_read_next(iterator);
 	}
+	// batch reply
+	if (pDictIter != NULL) {
+		dict_write_end(pDictIter);
+		AppMessageResult res = app_message_outbox_send();
+		idx_msg_result += snprintf(s_msg_result + idx_msg_result, 32, "[AppMessageresult:%d]", res);
+	}
+	APP_LOG(APP_LOG_LEVEL_DEBUG, s_msg_result);
 }
 
 void inbox_dropped_handler(AppMessageResult reason, void *context) {
@@ -182,22 +268,16 @@ void outbox_failed_handler(DictionaryIterator *iterator, AppMessageResult reason
 
 void main_window_load(Window *window) {
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "main_window_load");
-  
-	// create fonts
-	font_rebellion_14 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_KEY_REBELLION_14));
-	font_rebellion_28 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_KEY_REBELLION_28));
-  
+
 	// create bluetooth info layer
 	tl_bt = text_layer_create(GRect(0, 0, 60, 16));
 	text_layer_set_background_color(tl_bt, GColorClear);
-	text_layer_set_font(tl_bt, font_rebellion_14);
 	text_layer_set_text_alignment(tl_bt, GTextAlignmentLeft);
 	layer_add_child(window_get_root_layer(window), text_layer_get_layer(tl_bt));
   
 	// create charge state info layer
 	tl_charge = text_layer_create(GRect(0, 16, 60, 32));
 	text_layer_set_background_color(tl_charge, GColorClear);
-	text_layer_set_font(tl_charge, font_rebellion_14);
 	text_layer_set_text_alignment(tl_charge, GTextAlignmentLeft);
 	text_layer_set_overflow_mode(tl_charge, GTextOverflowModeWordWrap);
 	layer_add_child(window_get_root_layer(window), text_layer_get_layer(tl_charge));
@@ -205,14 +285,12 @@ void main_window_load(Window *window) {
 	// create time info layer
 	tl_time = text_layer_create(GRect(40, 0, 104, 32));
 	text_layer_set_background_color(tl_time, GColorClear);
-	text_layer_set_font(tl_time, font_rebellion_28);
 	text_layer_set_text_alignment(tl_time, GTextAlignmentRight);
 	layer_add_child(window_get_root_layer(window), text_layer_get_layer(tl_time));
 
 	// create date info layer
 	tl_date = text_layer_create(GRect(0, 32, 144, 16));
 	text_layer_set_background_color(tl_date, GColorClear);
-	text_layer_set_font(tl_date, font_rebellion_14);
 	text_layer_set_text_alignment(tl_date, GTextAlignmentRight);
 	// text_layer_set_overflow_mode(tl_date, GTextOverflowModeWordWrap);
 	layer_add_child(window_get_root_layer(window), text_layer_get_layer(tl_date));
@@ -224,6 +302,15 @@ void main_window_load(Window *window) {
 	// bitmap_layer_set_compositing_mode(bitmap_layer, GCompOpAssignInverted);
 	bitmap_layer_set_compositing_mode(bitmap_layer, GCompOpAssign);
 	layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(bitmap_layer));
+
+	// create and set fonts
+	font_conf.current_font = -1;
+	if (persist_exists(PERSISTENCE_ID_FONT)) {
+		font_conf.next_conf = persist_read_int(PERSISTENCE_ID_FONT);
+	} else {
+		font_conf.next_font = 0;
+	}
+	update_fonts();
   
 	// update all info layers's texts
 	update_bt(bluetooth_connection_service_peek());
@@ -253,15 +340,14 @@ void main_window_load(Window *window) {
 void main_window_unload(Window *window) {
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "main_window_unload");
 
-	// text_layer_destroy(text_layer);
 	text_layer_destroy(tl_time);
 	text_layer_destroy(tl_bt);
 	text_layer_destroy(tl_charge);
 	gbitmap_destroy(bitmap);
 	bitmap = 0;
 	bitmap_layer_destroy(bitmap_layer);
-	fonts_unload_custom_font(font_rebellion_14);
-	fonts_unload_custom_font(font_rebellion_28);
+	font_conf.next_font = -1; // do not set a new font
+	update_fonts();
   
 	tick_timer_service_unsubscribe();
 	bluetooth_connection_service_unsubscribe();

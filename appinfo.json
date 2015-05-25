@@ -1,5 +1,7 @@
 {
     "appKeys": {
+        "MSGKEY_FONT_GET": 2,
+        "MSGKEY_FONT_SET": 3,
         "MSGKEY_LOCALE_GET": 0,
         "MSGKEY_LOCALE_SET": 1
     },
@@ -11,6 +13,30 @@
     "projectType": "native",
     "resources": {
         "media": [
+            {
+                "characterRegex": "[0-9a-zA-Z %.:,;\\/\\-_]",
+                "file": "fonts/SourceCodePro-Bold14.ttf",
+                "name": "FONTS_KEY_SOURCECODEPRO_BOLD_14",
+                "type": "font"
+            },
+            {
+                "characterRegex": "[0-9a-zA-Z %.:,;\\/\\-_]",
+                "file": "fonts/SourceCodePro-Bold14.ttf",
+                "name": "FONTS_KEY_SOURCECODEPRO_BOLD_28",
+                "type": "font"
+            },
+            {
+                "characterRegex": "[0-9a-zA-Z %.:,;\\/\\-_]",
+                "file": "fonts/SourceCodePro-Regular14.ttf",
+                "name": "FONTS_KEY_SOURCECODEPRO_REGULAR_28",
+                "type": "font"
+            },
+            {
+                "characterRegex": "[0-9a-zA-Z %.:,;\\/\\-_]",
+                "file": "fonts/SourceCodePro-Regular14.ttf",
+                "name": "FONTS_KEY_SOURCECODEPRO_REGULAR_14",
+                "type": "font"
+            },
             {
                 "file": "images/jabba.png",
                 "name": "jabba",
@@ -28,14 +54,14 @@
             },
             {
                 "characterRegex": "[0-9a-zA-Z %.:,;\\/\\-_]",
-                "file": "fonts/Rebellion28.ttf",
-                "name": "FONT_KEY_REBELLION_28",
+                "file": "fonts/Rebellion14.ttf",
+                "name": "FONTS_KEY_REBELLION_28",
                 "type": "font"
             },
             {
                 "characterRegex": "[0-9a-zA-Z %.:,;\\/\\-_]",
                 "file": "fonts/Rebellion14.ttf",
-                "name": "FONT_KEY_REBELLION_14",
+                "name": "FONTS_KEY_REBELLION_14",
                 "type": "font"
             },
             {
