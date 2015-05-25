@@ -105,6 +105,7 @@ void update_locale() {
 	} else if (strcmp(current_locale, "fr") == 0) {
 		current_lang = 2;
 	}
+	APP_LOG(APP_LOG_LEVEL_INFO, current_locale);
 }
 
 void update_date() {
@@ -215,10 +216,13 @@ void tick_handler_minutes(struct tm *tick_time, TimeUnits units_changed) {
 	}
 }
 
+#define APPEND_LOG_MSG(format, arg) do { idx_msg_result += snprintf(s_msg_result + idx_msg_result, idx_msg_result_max - idx_msg_result, format, arg); } while(0)
+
 void inbox_received_handler(DictionaryIterator *iterator, void *context) {
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "inboxReceived");
 
-	static char s_msg_result[160];
+	static char s_msg_result[161];
+	static const int idx_msg_result_max = 160;
 	int idx_msg_result = 0;
 	DictionaryIterator * pDictIter = NULL;
 	Tuple *t = dict_read_first(iterator);
@@ -228,26 +232,26 @@ void inbox_received_handler(DictionaryIterator *iterator, void *context) {
 				APP_LOG(APP_LOG_LEVEL_ERROR, "Could not get DictionaryIterator for MSGKEY_LOCALE_GET");
 			} else {
 				dict_write_cstring(pDictIter, MSG_KEY_LOCALE_GET, current_locale);
-				idx_msg_result += snprintf(s_msg_result + idx_msg_result, 32, "[get locale:%s]", current_locale);
+				APPEND_LOG_MSG("[get locale: %s]", current_locale);
 			}
 		} else if (t->key == MSG_KEY_FONT_GET) {
 			if (pDictIter == NULL && (app_message_outbox_begin(&pDictIter) != APP_MSG_OK)) {
-				APP_LOG(APP_LOG_LEVEL_ERROR, "Could not get DictionaryIterator for MSGKEY_LOCALE_GET");
+				APP_LOG(APP_LOG_LEVEL_ERROR, "Could not get DictionaryIterator for MSG_KEY_FONT_GET");
 			} else {
 				dict_write_cstring(pDictIter, MSG_KEY_FONT_GET, fonts[font_conf.current_font]);
-				idx_msg_result += snprintf(s_msg_result + idx_msg_result, 32, "[get font:%s]", fonts[font_conf.current_font]);
+				APPEND_LOG_MSG("[get font: %s]", fonts[font_conf.current_font]);
 			}
 		} else if (t->key == MSG_KEY_LOCALE_SET) {
 			char* loc = t->value->cstring;
 			if (strlen(loc) == 0 || strcmp(loc, "sys") == 0) {
 				persist_delete(PERSISTENCE_ID_LOCALE);
-				idx_msg_result += snprintf(s_msg_result + idx_msg_result, 32, "[reset locale:%s]", loc);
+				APPEND_LOG_MSG("[reset locale: %s]", loc);
 				update_locale();
 				update_date();
 				update_time();
 			} else if (strcmp(loc, "de") == 0 || strcmp(loc, "en") == 0 || strcmp(loc, "fr") == 0) {
 				persist_write_string(PERSISTENCE_ID_LOCALE, loc);
-				idx_msg_result += snprintf(s_msg_result + idx_msg_result, 32, "[set locale:%s]", loc);
+				APPEND_LOG_MSG("[set locale: %s]", loc);
 				update_locale();
 				update_date();
 				update_time();
@@ -260,7 +264,7 @@ void inbox_received_handler(DictionaryIterator *iterator, void *context) {
 			for (short i = 0; i < NUM_FONTS; ++i) {
 				if (strcmp(font, fonts[i]) == 0) {
 					font_conf.next_font = i;
-					idx_msg_result += snprintf(s_msg_result + idx_msg_result, 32, "[set font:%s]", fonts[font_conf.next_font]);
+					APPEND_LOG_MSG("[set font: %s]", fonts[font_conf.next_font]);
 					break;
 				}
 			}
@@ -276,7 +280,7 @@ void inbox_received_handler(DictionaryIterator *iterator, void *context) {
 	if (pDictIter != NULL) {
 		dict_write_end(pDictIter);
 		AppMessageResult res = app_message_outbox_send();
-		idx_msg_result += snprintf(s_msg_result + idx_msg_result, 32, "[AppMessageresult:%d]", res);
+		APPEND_LOG_MSG("[AppMessageresult:%d]", res);
 	}
 	APP_LOG(APP_LOG_LEVEL_DEBUG, s_msg_result);
 }
