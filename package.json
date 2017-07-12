@@ -1,0 +1,129 @@
+{
+    "author": "TK4 Private Inc.",
+    "dependencies": {},
+    "keywords": [],
+    "name": "the-force",
+    "pebble": {
+        "capabilities": [
+            "location",
+            "configurable",
+            "health"
+        ],
+        "displayName": "The Force Watchface",
+        "enableMultiJS": true,
+        "messageKeys": [
+            "MSGKEY_LOCALE_GET",
+            "MSGKEY_LOCALE_SET",
+            "MSGKEY_FONT_GET",
+            "MSGKEY_FONT_SET"
+        ],
+        "projectType": "native",
+        "resources": {
+            "media": [
+                {
+                    "file": "images/darth_vader.png",
+                    "name": "darth_vader",
+                    "targetPlatforms": null,
+                    "type": "png"
+                },
+                {
+                    "file": "images/boba_fett.png",
+                    "name": "boba_fett",
+                    "targetPlatforms": null,
+                    "type": "png"
+                },
+                {
+                    "file": "images/the_force_logo.png",
+                    "menuIcon": true,
+                    "name": "the_force_logo",
+                    "type": "png"
+                },
+                {
+                    "file": "images/pebble-theforce-screenshot.png",
+                    "name": "screenshot",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/death_star.png",
+                    "name": "death_star",
+                    "targetPlatforms": null,
+                    "type": "png"
+                },
+                {
+                    "file": "images/millenium-falcon.png",
+                    "name": "millenium_falcon",
+                    "targetPlatforms": null,
+                    "type": "png"
+                },
+                {
+                    "file": "images/jabba.png",
+                    "name": "jabba",
+                    "targetPlatforms": null,
+                    "type": "png"
+                },
+                {
+                    "file": "images/star_wars_logo.png",
+                    "name": "star_wars",
+                    "targetPlatforms": null,
+                    "type": "png"
+                },
+                {
+                    "file": "images/han_solo.png",
+                    "name": "han_solo",
+                    "targetPlatforms": null,
+                    "type": "png"
+                },
+                {
+                    "characterRegex": "[0-9a-zA-Z %.:,;\\/\\-_]",
+                    "file": "fonts/Rebellion14.ttf",
+                    "name": "FONTS_KEY_REBELLION_14",
+                    "type": "font"
+                },
+                {
+                    "characterRegex": "[0-9a-zA-Z %.:,;\\/\\-_]",
+                    "file": "fonts/Rebellion14.ttf",
+                    "name": "FONTS_KEY_REBELLION_28",
+                    "type": "font"
+                },
+                {
+                    "characterRegex": "[0-9a-zA-Z %.:,;\\/\\-_]",
+                    "file": "fonts/SourceCodePro-Regular14.ttf",
+                    "name": "FONTS_KEY_SOURCECODEPRO_REGULAR_14",
+                    "type": "font"
+                },
+                {
+                    "characterRegex": "[0-9a-zA-Z %.:,;\\/\\-_]",
+                    "file": "fonts/SourceCodePro-Regular14.ttf",
+                    "name": "FONTS_KEY_SOURCECODEPRO_REGULAR_28",
+                    "type": "font"
+                },
+                {
+                    "characterRegex": "[0-9a-zA-Z %.:,;\\/\\-_]",
+                    "file": "fonts/SourceCodePro-Bold14.ttf",
+                    "name": "FONTS_KEY_SOURCECODEPRO_BOLD_28",
+                    "type": "font"
+                },
+                {
+                    "characterRegex": "[0-9a-zA-Z %.:,;\\/\\-_]",
+                    "file": "fonts/SourceCodePro-Bold14.ttf",
+                    "name": "FONTS_KEY_SOURCECODEPRO_BOLD_14",
+                    "type": "font"
+                }
+            ]
+        },
+        "sdkVersion": "3",
+        "targetPlatforms": [
+            "aplite",
+            "basalt",
+            "chalk",
+            "diorite",
+            "emery"
+        ],
+        "uuid": "0e3557a2-fa9a-4b79-b6c8-8aa2a4f8427a",
+        "watchapp": {
+            "watchface": true
+        }
+    },
+    "version": "0.6.0"
+}
